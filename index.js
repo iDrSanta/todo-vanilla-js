@@ -156,5 +156,4 @@ const render = () => {
   tasksList.innerHTML = '';
   localStorage.setItem('items', JSON.stringify(todoTasks));
   renderTasksList();
-  console.log(todoTasks);
 };
