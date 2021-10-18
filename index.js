@@ -39,7 +39,7 @@ const categoryColor = [
 
 const setCategory = (id) => {
   for (let index in categoryColor) {
-    if (id == index) {
+    if (id === index) {
       categoryColor[index].active = true;
     } else {
       categoryColor[index].active = false;
@@ -48,7 +48,7 @@ const setCategory = (id) => {
 };
 
 const createCategoryList = () => {
-  categoryColor.forEach(function (item, index, categoryColor) {
+  categoryColor.forEach(function (item, index) {
     const li = document.createElement('li');
     li.setAttribute('id', index);
     li.style.backgroundColor = item.color;
@@ -70,20 +70,22 @@ const renderCategoryList = () => {
 renderCategoryList();
 
 let inputValue = '';
-const setInputValue = (text) => {
-  inputValue = text;
+const setInputValue = () => {
+  inputValue = todoInput.value;
 };
 
-todoInput.addEventListener('input', () => {
-  setInputValue(todoInput.value);
-});
+todoInput.addEventListener('input', setInputValue);
 
 let todoTasks = localStorage.getItem('items') ? JSON.parse(localStorage.getItem('items')) : [];
 
 const handleClickAdd = () => {
   let lastTask = todoTasks[todoTasks.length - 1];
   let newTaskId;
-  !!todoTasks.length ? (newTaskId = lastTask.id + 1) : (newTaskId = 0);
+  if (todoTasks.length) {
+    newTaskId = lastTask.id + 1;
+  } else {
+    newTaskId = 0;
+  }
   const activeColor = categoryColor.filter((elem) => elem.active);
   const newTask = {
     id: newTaskId,
@@ -106,17 +108,15 @@ const handleClickRemove = (id) => {
   const question = confirm('Уверен?', '');
   if (question) {
     todoTasks = todoTasks.filter((elem) => Number(elem.id) !== Number(id));
-    console.log(id);
-    console.log(todoTasks);
     render();
   }
 };
 const handleClickRename = (id) => {
   const newTextTask = prompt('Введите текст задачи', '');
   if (newTextTask.trim()) {
-    for (let index in todoTasks) {
-      if (Number(todoTasks[index].id === Number(id))) {
-        todoTasks[index].text = newTextTask;
+    for (let elem of todoTasks) {
+      if (Number(elem.id === Number(id))) {
+        elem.text = newTextTask;
       }
     }
     render();
@@ -138,17 +138,15 @@ const createTaskBtn = (id, text, funcBtn, classBtn) => {
 };
 
 const renderTasksList = () => {
-  for (let index in todoTasks) {
+  for (let elem of todoTasks) {
     const task = document.createElement('li');
-    task.setAttribute('id', todoTasks[index].id);
-    task.innerHTML = todoTasks[index].text;
-    task.style.border = `2px solid ${todoTasks[index].color}`;
+    task.setAttribute('id', elem.id);
+    task.innerHTML = elem.text;
+    task.style.border = `2px solid ${elem.color}`;
 
     tasksList.append(task);
-    tasksList.append(createTaskBtn(todoTasks[index].id, 'x', handleClickRemove, 'remove'));
-    tasksList.append(
-      createTaskBtn(todoTasks[index].id, 'редактировать', handleClickRename, 'rename'),
-    );
+    tasksList.append(createTaskBtn(elem.id, 'x', handleClickRemove, 'remove'));
+    tasksList.append(createTaskBtn(elem.id, 'редактировать', handleClickRename, 'rename'));
   }
 };
 
